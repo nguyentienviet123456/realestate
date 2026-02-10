@@ -1,38 +1,44 @@
 package com.ntt.realestate.service;
 
-import com.ntt.realestate.dto.AnalyzeResponse;
+import com.ntt.realestate.dto.ExtractResponse;
 import com.ntt.realestate.model.ChatMessage;
 import com.ntt.realestate.model.ChatSession;
-import com.ntt.realestate.model.PropertyDetails;
-import com.ntt.realestate.model.PropertyField;
 import com.ntt.realestate.repository.ChatSessionRepository;
-import com.ntt.realestate.repository.PropertyDetailsRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AnalysisService {
 
     private final LlmService llmService;
     private final ChatSessionRepository chatSessionRepository;
-    private final PropertyDetailsRepository propertyDetailsRepository;
 
-    public AnalyzeResponse analyzePdf(MultipartFile file, String sessionId, String userId) throws IOException {
+    @Value("${app.callback.base-url:http://localhost:8080}")
+    private String callbackBaseUrl;
+
+    /**
+     * Extract PDF flow:
+     * 1. Create/reuse session (sync)
+     * 2. Send PDF to LLM API (sync — waits for LLM to acknowledge)
+     * 3. LLM processes and calls callback endpoint to save PropertyDetails
+     * 4. Return sessionId + status to frontend
+     */
+    public ExtractResponse extractPdf(MultipartFile file, String sessionId, String userId) throws IOException {
         byte[] pdfBytes = file.getBytes();
         String fileName = file.getOriginalFilename();
 
-        List<PropertyField> fields = llmService.analyzePdf(pdfBytes, fileName);
-        String summary = llmService.generateSummary(fields);
-
         Instant now = Instant.now();
 
+        // Step 1: Create or reuse session
         ChatSession session;
         if (sessionId != null && !sessionId.isBlank()) {
             session = chatSessionRepository.findByIdAndUserId(sessionId, userId)
@@ -48,31 +54,18 @@ public class AnalysisService {
             .role("user").type("pdf_upload")
             .content("Uploaded: " + fileName)
             .timestamp(now).build());
-        session.getMessages().add(ChatMessage.builder()
-            .role("assistant").type("analysis_result")
-            .content(summary)
-            .timestamp(now).build());
         session.setUpdatedAt(now);
-
         session = chatSessionRepository.save(session);
 
-        PropertyDetails details = PropertyDetails.builder()
-            .sessionId(session.getId())
-            .originalFileName(fileName)
-            .fields(fields)
-            .createdAt(now)
-            .updatedAt(now)
-            .build();
-        details = propertyDetailsRepository.save(details);
+        // Step 2: Send to LLM API (sync call, blocks until acknowledged)
+        String callbackUrl = callbackBaseUrl + "/api/callback/property";
+        llmService.sendForExtraction(pdfBytes, fileName, session.getId(), callbackUrl);
 
-        session.setPropertyDetailsId(details.getId());
-        chatSessionRepository.save(session);
+        log.info("Extract request sent for session={}, file={}", session.getId(), fileName);
 
-        return AnalyzeResponse.builder()
+        return ExtractResponse.builder()
             .sessionId(session.getId())
-            .propertyDetailsId(details.getId())
-            .fields(fields)
-            .summary(summary)
+            .status("processing")
             .build();
     }
 

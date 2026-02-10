@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PropertyField {
     private String fieldName;
+    private String displayName;
     private String value;
     private String status;   // "done" or "pending"
     private String category;

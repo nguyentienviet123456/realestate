@@ -1,8 +1,4 @@
-import { PropertyField } from './property-details.model';
-
-export interface AnalyzeResponse {
+export interface ExtractResponse {
   sessionId: string;
-  propertyDetailsId: string;
-  fields: PropertyField[];
-  summary: string;
+  status: 'processing' | 'completed' | 'failed';
 }

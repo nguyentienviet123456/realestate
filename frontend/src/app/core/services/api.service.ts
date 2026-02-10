@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ChatSession, ChatSessionSummary } from '../models/chat-session.model';
 import { PropertyDetails } from '../models/property-details.model';
-import { AnalyzeResponse } from '../models/analyze-response.model';
+import { ExtractResponse } from '../models/analyze-response.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -11,13 +11,13 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
-  analyzePdf(file: File, sessionId?: string): Observable<AnalyzeResponse> {
+  extractPdf(file: File, sessionId?: string): Observable<ExtractResponse> {
     const formData = new FormData();
     formData.append('file', file);
     if (sessionId) {
       formData.append('sessionId', sessionId);
     }
-    return this.http.post<AnalyzeResponse>(`${this.baseUrl}/analyze`, formData);
+    return this.http.post<ExtractResponse>(`${this.baseUrl}/extract`, formData);
   }
 
   getSessions(): Observable<ChatSessionSummary[]> {

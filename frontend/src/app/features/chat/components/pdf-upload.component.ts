@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../core/services/api.service';
 import { SessionService } from '../../../core/services/session.service';
-import { AnalyzeResponse } from '../../../core/models/analyze-response.model';
+import { ExtractResponse } from '../../../core/models/analyze-response.model';
 
 @Component({
   selector: 'app-pdf-upload',
@@ -13,7 +13,7 @@ import { AnalyzeResponse } from '../../../core/models/analyze-response.model';
 export class PdfUploadComponent {
   @Input() sessionId?: string;
   @Input() compact = false;
-  @Output() analysisComplete = new EventEmitter<AnalyzeResponse>();
+  @Output() extractComplete = new EventEmitter<ExtractResponse>();
 
   isDragging = false;
   isUploading = false;
@@ -64,12 +64,12 @@ export class PdfUploadComponent {
     this.isUploading = true;
     this.sessionService.isLoading.set(true);
 
-    this.apiService.analyzePdf(file, this.sessionId).subscribe({
+    this.apiService.extractPdf(file, this.sessionId).subscribe({
       next: (response) => {
         this.isUploading = false;
         this.selectedFileName = '';
         this.sessionService.isLoading.set(false);
-        this.analysisComplete.emit(response);
+        this.extractComplete.emit(response);
       },
       error: () => {
         this.isUploading = false;

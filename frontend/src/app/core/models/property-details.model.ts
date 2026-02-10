@@ -1,5 +1,6 @@
 export interface PropertyField {
   fieldName: string;
+  displayName: string;
   value: string;
   status: 'done' | 'pending';
   category: string;

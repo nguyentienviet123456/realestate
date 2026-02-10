@@ -1,50 +1,41 @@
 <div class="h-full flex flex-col">
   <!-- Header -->
-  <div class="p-4 border-b border-gray-200 flex items-center justify-between">
-    <div class="flex items-center gap-2">
-      @if (sessionService.stats().pending > 0) {
-        <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 rounded">
-          Pending
-        </span>
-      }
+  <div class="p-4 border-b border-gray-200">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-sm font-semibold text-gray-700">物件属性</h2>
+      <div class="flex items-center gap-2">
+        <select
+          [ngModel]="sessionService.filterStatus()"
+          (ngModelChange)="onFilterChange($event)"
+          class="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary"
+        >
+          <option value="all">すべて</option>
+          <option value="done">完了</option>
+          <option value="pending">確認中</option>
+        </select>
+      </div>
     </div>
-    <div class="flex items-center gap-2">
-      <span class="text-xs text-gray-500">Filter</span>
-      <select
-        [ngModel]="sessionService.filterStatus()"
-        (ngModelChange)="onFilterChange($event)"
-        class="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary"
-      >
-        <option value="all">All</option>
-        <option value="done">Done</option>
-        <option value="pending">Pending</option>
-      </select>
-    </div>
+    @if (sessionService.activePropertyDetails()) {
+      <div class="flex items-center gap-3 text-xs text-gray-500">
+        <span>全 {{ sessionService.stats().total }} 項目</span>
+        <span class="text-green-600">完了 {{ sessionService.stats().done }}</span>
+        <span class="text-yellow-600">確認中 {{ sessionService.stats().pending }}</span>
+      </div>
+    }
   </div>
 
   <!-- Content -->
   <div class="flex-1 overflow-y-auto">
     @if (sessionService.activePropertyDetails()) {
-      <div class="p-4 space-y-4">
-        @for (group of sessionService.categoryGroups(); track group.category) {
-          <app-category-group [group]="group" />
+      <div class="p-3 space-y-2">
+        @for (group of sessionService.categoryGroups(); track group.category; let i = $index) {
+          <app-category-group [group]="group" [index]="i + 1" />
         }
       </div>
     } @else {
       <div class="flex items-center justify-center h-full text-gray-400 text-sm">
-        Upload a PDF to see property details
+        PDFをアップロードして物件情報を表示
       </div>
     }
   </div>
-
-  <!-- Stats Footer -->
-  @if (sessionService.activePropertyDetails()) {
-    <div class="p-3 border-t border-gray-200 flex items-center justify-between text-xs text-gray-500">
-      <span>Total: {{ sessionService.stats().total }} fields</span>
-      <div class="flex gap-3">
-        <span class="text-status-done">Done: {{ sessionService.stats().done }}</span>
-        <span class="text-status-pending">Pending: {{ sessionService.stats().pending }}</span>
-      </div>
-    </div>
-  }
 </div>

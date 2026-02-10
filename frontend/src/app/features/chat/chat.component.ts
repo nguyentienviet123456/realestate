@@ -4,7 +4,7 @@ import { PdfUploadComponent } from './components/pdf-upload.component';
 import { MessageBubbleComponent } from './components/message-bubble.component';
 import { SessionService } from '../../core/services/session.service';
 import { ApiService } from '../../core/services/api.service';
-import { AnalyzeResponse } from '../../core/models/analyze-response.model';
+import { ExtractResponse } from '../../core/models/analyze-response.model';
 
 @Component({
   selector: 'app-chat',
@@ -16,20 +16,18 @@ export class ChatComponent {
   sessionService = inject(SessionService);
   private apiService = inject(ApiService);
 
-  onAnalysisComplete(response: AnalyzeResponse): void {
-    // Reload session data
+  onExtractComplete(response: ExtractResponse): void {
+    // Load session data (chat messages)
     this.apiService.getSession(response.sessionId).subscribe({
-      next: (session) => {
-        this.sessionService.activeSession.set(session);
-        this.apiService.getPropertyDetails(response.sessionId).subscribe({
-          next: (details) => {
-            this.sessionService.activePropertyDetails.set(details);
-          },
-        });
-      },
+      next: (session) => this.sessionService.activeSession.set(session),
     });
 
-    // Refresh session list
+    // Load property details for column 3
+    this.apiService.getPropertyDetails(response.sessionId).subscribe({
+      next: (details) => this.sessionService.activePropertyDetails.set(details),
+    });
+
+    // Refresh session list in sidebar
     this.apiService.getSessions().subscribe({
       next: (sessions) => this.sessionService.sessions.set(sessions),
     });

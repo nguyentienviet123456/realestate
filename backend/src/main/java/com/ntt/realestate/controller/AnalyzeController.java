@@ -1,6 +1,6 @@
 package com.ntt.realestate.controller;
 
-import com.ntt.realestate.dto.AnalyzeResponse;
+import com.ntt.realestate.dto.ExtractResponse;
 import com.ntt.realestate.model.User;
 import com.ntt.realestate.repository.UserRepository;
 import com.ntt.realestate.service.AnalysisService;
@@ -22,14 +22,14 @@ public class AnalyzeController {
     private final AnalysisService analysisService;
     private final UserRepository userRepository;
 
-    @PostMapping(value = "/analyze", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<AnalyzeResponse> analyzePdf(
+    @PostMapping(value = "/extract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ExtractResponse> extractPdf(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "sessionId", required = false) String sessionId) throws Exception {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("User not found: " + username));
-        AnalyzeResponse response = analysisService.analyzePdf(file, sessionId, user.getId());
+        ExtractResponse response = analysisService.extractPdf(file, sessionId, user.getId());
         return ResponseEntity.ok(response);
     }
 }

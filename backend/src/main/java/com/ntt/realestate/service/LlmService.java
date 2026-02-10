@@ -1,10 +1,15 @@
 package com.ntt.realestate.service;
 
-import com.ntt.realestate.model.PropertyField;
-
-import java.util.List;
-
 public interface LlmService {
-    List<PropertyField> analyzePdf(byte[] pdfContent, String fileName);
-    String generateSummary(List<PropertyField> fields);
+    /**
+     * Send PDF to LLM API for property extraction.
+     * This call is synchronous — blocks until LLM API acknowledges receipt.
+     * LLM processes async and calls callbackUrl with results when done.
+     *
+     * @param pdfContent   raw PDF bytes
+     * @param fileName     original file name
+     * @param sessionId    session to associate results with
+     * @param callbackUrl  URL the LLM should POST results to
+     */
+    void sendForExtraction(byte[] pdfContent, String fileName, String sessionId, String callbackUrl);
 }

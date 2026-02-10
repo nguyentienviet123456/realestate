@@ -1,20 +1,17 @@
 package com.ntt.realestate.dto;
 
 import com.ntt.realestate.model.PropertyField;
+import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnalyzeResponse {
+public class LlmRequest {
+    private String callback;
     private String sessionId;
-    private String propertyDetailsId;
+    private String originalFileName;
     private List<PropertyField> fields;
-    private String summary;
 }
