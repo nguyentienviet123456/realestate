@@ -8,19 +8,54 @@
 
   @if (sessionService.activeSession(); as session) {
     <!-- Messages -->
-    <div class="flex-1 overflow-y-auto p-6 space-y-4">
+    <div #messagesContainer class="flex-1 overflow-y-auto p-6 space-y-4">
       @for (message of session.messages; track $index) {
         <app-message-bubble [message]="message" />
       }
+      @if (sending()) {
+        <div class="flex justify-start">
+          <div class="flex items-start gap-3 max-w-[80%]">
+            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 text-xs font-bold text-gray-600">
+              AI
+            </div>
+            <div class="bg-white rounded-lg rounded-tl-none p-4 shadow-sm border border-gray-100">
+              <div class="flex items-center gap-1">
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
     </div>
 
-    <!-- Upload area at bottom -->
+    <!-- Chat input + PDF upload -->
     <div class="p-4 border-t border-gray-200 bg-white">
-      <app-pdf-upload
-        [sessionId]="session.id"
-        (extractComplete)="onExtractComplete($event)"
-        [compact]="true"
-      />
+      <div class="flex items-end gap-2">
+        <div class="flex-1">
+          <textarea
+            [(ngModel)]="messageInput"
+            (keydown.enter)="onEnterKey($event)"
+            [disabled]="sending()"
+            placeholder="メッセージを入力..."
+            rows="1"
+            class="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary disabled:opacity-50 disabled:bg-gray-50"
+          ></textarea>
+        </div>
+        <button
+          (click)="sendMessage()"
+          [disabled]="!messageInput.trim() || sending()"
+          class="flex-shrink-0 bg-primary text-white rounded-lg px-4 py-2.5 text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          送信
+        </button>
+        <app-pdf-upload
+          [sessionId]="session.id"
+          (extractComplete)="onExtractComplete($event)"
+          [compact]="true"
+        />
+      </div>
     </div>
   } @else {
     <!-- Empty state with prominent upload -->

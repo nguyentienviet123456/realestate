@@ -31,4 +31,8 @@ export class ApiService {
   getPropertyDetails(sessionId: string): Observable<PropertyDetails> {
     return this.http.get<PropertyDetails>(`${this.baseUrl}/sessions/${sessionId}/property`);
   }
+
+  sendMessage(sessionId: string, content: string): Observable<ChatSession> {
+    return this.http.post<ChatSession>(`${this.baseUrl}/sessions/${sessionId}/messages`, { content });
+  }
 }

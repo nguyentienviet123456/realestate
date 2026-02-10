@@ -1,5 +1,6 @@
 package com.ntt.realestate.controller;
 
+import com.ntt.realestate.dto.ChatMessageRequest;
 import com.ntt.realestate.dto.ChatSessionSummary;
 import com.ntt.realestate.model.ChatSession;
 import com.ntt.realestate.model.PropertyDetails;
@@ -7,13 +8,11 @@ import com.ntt.realestate.model.User;
 import com.ntt.realestate.repository.ChatSessionRepository;
 import com.ntt.realestate.repository.PropertyDetailsRepository;
 import com.ntt.realestate.repository.UserRepository;
+import com.ntt.realestate.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +25,7 @@ public class ChatSessionController {
     private final ChatSessionRepository chatSessionRepository;
     private final PropertyDetailsRepository propertyDetailsRepository;
     private final UserRepository userRepository;
+    private final ChatService chatService;
 
     @GetMapping
     public ResponseEntity<List<ChatSessionSummary>> listSessions() {
@@ -49,6 +49,15 @@ public class ChatSessionController {
         return chatSessionRepository.findByIdAndUserId(id, userId)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/messages")
+    public ResponseEntity<ChatSession> sendMessage(
+            @PathVariable String id,
+            @RequestBody ChatMessageRequest request) {
+        String userId = getCurrentUserId();
+        ChatSession session = chatService.sendMessage(id, userId, request.getContent());
+        return ResponseEntity.ok(session);
     }
 
     @GetMapping("/{id}/property")
