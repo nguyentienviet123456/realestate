@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(java:*)",
+      "Bash(ng version:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(/usr/libexec/java_home:*)",
+      "Bash(nvm ls:*)",
+      "Bash(command -v:*)",
+      "Bash(fnm ls:*)",
+      "Bash(export JAVA_HOME:*)",
+      "Bash(./mvnw clean compile:*)",
+      "Bash(source ~/.nvm/nvm.sh)",
+      "Bash(nvm use:*)",
+      "Bash(npx @angular/cli@18 new:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss init)",
+      "Bash(npx ng build:*)",
+      "Bash(./mvnw clean spring-boot:run:*)",
+      "Bash(./mvnw spring-boot:run:*)",
+      "Bash(curl:*)"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: realestate-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+      MONGO_INITDB_DATABASE: realestate_dx
+    volumes:
+      - mongo-data:/data/db
+    # networks:
+    #   - realestate-net
+
+# networks:
+#   realestate-net:
+#     driver: bridge
+
+volumes:
+  mongo-data:

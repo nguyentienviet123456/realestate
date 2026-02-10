@@ -1,0 +1,33 @@
+<div class="border border-gray-200 rounded-lg overflow-hidden">
+  <!-- Category Header -->
+  <button
+    (click)="toggle()"
+    class="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+  >
+    <span class="text-sm font-semibold text-gray-700">{{ group.category }}</span>
+    <div class="flex items-center gap-2">
+      <span class="text-xs text-status-done">{{ group.doneCount }}</span>
+      <span class="text-xs text-gray-300">/</span>
+      <span class="text-xs text-status-pending">{{ group.pendingCount }}</span>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-4 w-4 text-gray-400 transition-transform"
+        [class.rotate-180]="!isCollapsed"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+  </button>
+
+  <!-- Fields -->
+  @if (!isCollapsed) {
+    <div class="divide-y divide-gray-100">
+      @for (field of group.fields; track field.fieldName) {
+        <app-field-row [field]="field" />
+      }
+    </div>
+  }
+</div>

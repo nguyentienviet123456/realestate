@@ -1,0 +1,22 @@
+<div
+  class="flex"
+  [class.justify-end]="message.role === 'user'"
+  [class.justify-start]="message.role === 'assistant'"
+>
+  @if (message.role === 'assistant') {
+    <div class="flex items-start gap-3 max-w-[80%]">
+      <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 text-xs font-bold text-gray-600">
+        AI
+      </div>
+      <div class="bg-white rounded-lg rounded-tl-none p-4 shadow-sm border border-gray-100">
+        <p class="text-sm text-gray-700 whitespace-pre-line">{{ message.content }}</p>
+      </div>
+    </div>
+  } @else {
+    <div class="max-w-[80%]">
+      <div class="bg-primary text-white rounded-lg rounded-tr-none p-4">
+        <p class="text-sm whitespace-pre-line">{{ message.content }}</p>
+      </div>
+    </div>
+  }
+</div>
