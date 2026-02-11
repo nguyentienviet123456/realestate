@@ -11,12 +11,38 @@ services:
       MONGO_INITDB_DATABASE: realestate_dx
     volumes:
       - mongo-data:/data/db
-    # networks:
-    #   - realestate-net
+    networks:
+      - realestate-net
 
-# networks:
-#   realestate-net:
-#     driver: bridge
+  backend:
+    build: ./backend
+    container_name: realestate-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:rootpassword@mongodb:27017/realestate_dx?authSource=admin
+      APP_CORS_ALLOWED_ORIGINS: http://localhost:4200,http://localhost
+      APP_LLM_MOCK: "true"
+      APP_LLM_API_URL: http://host.docker.internal:9000/api/v1/chat
+      APP_CALLBACK_BASE_URL: http://backend:8080
+    depends_on:
+      - mongodb
+    networks:
+      - realestate-net
+
+  frontend:
+    build: ./frontend
+    container_name: realestate-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - realestate-net
+
+networks:
+  realestate-net:
+    driver: bridge
 
 volumes:
   mongo-data:
