@@ -1,6 +1,5 @@
 package com.ntt.realestate.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ntt.realestate.dto.LlmChatResponse;
 import com.ntt.realestate.dto.LlmRequest;
@@ -19,6 +18,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -61,18 +62,35 @@ public class RealLlmService implements LlmService {
             throw new RuntimeException("Empty response from LLM API for session=" + sessionId);
         }
 
-        log.info("RealLLM: Received response for session={}, message length={}",
-            sessionId, chatResponse.getMessage() != null ? chatResponse.getMessage().length() : 0);
+        log.info("RealLLM: Received response for session={}, conversationId={}, tokensUsed={}",
+            sessionId, chatResponse.getConversationId(), chatResponse.getTokensUsed());
 
-        List<PropertyField> fields = parseExtractedData(chatResponse.getExtractedData());
+        PropertyCallbackRequest saveData = chatResponse.getSaveDatabase();
+        List<PropertyField> llmFields = (saveData != null && saveData.getFields() != null)
+            ? saveData.getFields() : List.of();
 
-        if (fields.isEmpty()) {
-            log.warn("RealLLM: No fields extracted for session={}", sessionId);
-        }
+        // Merge LLM results into the full template
+        List<PropertyField> mergedFields = mergeFields(buildEmptyFields(), llmFields);
 
-        propertyCallbackService.processCallback(sessionId, fileName, fields);
+        log.info("RealLLM: Merged {}/{} fields with data for session={}",
+            llmFields.size(), mergedFields.size(), sessionId);
 
-        log.info("RealLLM: Processed {} fields for session={}", fields.size(), sessionId);
+        propertyCallbackService.processCallback(sessionId, fileName, mergedFields);
+    }
+
+    private List<PropertyField> mergeFields(List<PropertyField> template, List<PropertyField> llmFields) {
+        // Index LLM fields by fieldName for quick lookup
+        Map<String, PropertyField> llmMap = llmFields.stream()
+            .collect(Collectors.toMap(PropertyField::getFieldName, f -> f, (a, b) -> b));
+
+        return template.stream().map(field -> {
+            PropertyField matched = llmMap.get(field.getFieldName());
+            if (matched != null && matched.getValue() != null && !matched.getValue().isBlank()) {
+                field.setValue(matched.getValue());
+                field.setStatus(matched.getStatus() != null ? matched.getStatus() : "done");
+            }
+            return field;
+        }).collect(Collectors.toList());
     }
 
     private String buildExtractedDataTemplate(String callbackUrl, String sessionId, String fileName) {
@@ -85,7 +103,7 @@ public class RealLlmService implements LlmService {
         }
     }
 
-    private List<PropertyField> buildEmptyFields() {
+    private static List<PropertyField> buildEmptyFields() {
         List<PropertyField> fields = new ArrayList<>();
 
         // 1. 用途・法令・成立前提
@@ -202,7 +220,7 @@ public class RealLlmService implements LlmService {
         return fields;
     }
 
-    private PropertyField emptyField(String category, String fieldName, String displayName) {
+    private static PropertyField emptyField(String category, String fieldName, String displayName) {
         return PropertyField.builder()
             .category(category)
             .fieldName(fieldName)
@@ -212,15 +230,4 @@ public class RealLlmService implements LlmService {
             .build();
     }
 
-    private List<PropertyField> parseExtractedData(String extractedData) {
-        if (extractedData == null || extractedData.isBlank()) {
-            return List.of();
-        }
-        try {
-            return objectMapper.readValue(extractedData, new TypeReference<>() {});
-        } catch (Exception e) {
-            log.error("Failed to parse extracted_data from LLM response: {}", e.getMessage());
-            return List.of();
-        }
-    }
 }
