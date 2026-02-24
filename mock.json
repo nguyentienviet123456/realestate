@@ -74,8 +74,6 @@
     {"fieldName":"pastComplaints","displayName":"過去クレーム","value":"","status":"pending","category":"判断補助・失注防止"},
     {"fieldName":"noiseOdorTolerance","displayName":"騒音・匂い耐性","value":"","status":"pending","category":"判断補助・失注防止"},
     {"fieldName":"otherApplicationsStatus","displayName":"他申込状況","value":"","status":"pending","category":"判断補助・失注防止"},
-    {"fieldName":"requirementFulfillmentRate","displayName":"条件充足率","value":"","status":"pending","category":"判断補助・失注防止"},
-    {"fieldName":"priorityAlignment","displayName":"優先順位適合","value":"","status":"pending","category":"判断補助・失注防止"},
     {"fieldName":"nearestStationName","displayName":"最寄駅名","value":"","status":"pending","category":"立地・交通"},
     {"fieldName":"walkTimeMinutes","displayName":"駅徒歩分数","value":"","status":"pending","category":"立地・交通"},
     {"fieldName":"availableLineCount","displayName":"利用路線数","value":"","status":"pending","category":"立地・交通"},
@@ -86,6 +84,12 @@
     {"fieldName":"interchangeDistance","displayName":"IC距離","value":"","status":"pending","category":"立地・交通"},
     {"fieldName":"largeVehicleAccess","displayName":"大型車進入可否","value":"","status":"pending","category":"立地・交通"},
     {"fieldName":"mainRoadAccess","displayName":"幹線道路接続","value":"","status":"pending","category":"立地・交通"},
-    {"fieldName":"turningRestrictions","displayName":"右左折制限","value":"","status":"pending","category":"立地・交通"}
+    {"fieldName":"turningRestrictions","displayName":"右左折制限","value":"","status":"pending","category":"立地・交通"},
+    {"fieldName":"conditionOwnerMusthave","displayName":"オーナー譲れない条件","value":"","status":"pending","category":"オーナー譲れない条件"}, 
+    {"fieldName":"conditionOwnerFlexible","displayName":"オーナー重視・柔軟対応","value":"","status":"pending","category":"オーナー重視・柔軟対応"},
+    {"fieldName":"conditionNg","displayName":"オーナーNG条件","value":"","status":"pending","category":"オーナーNG条件"},
+    {"fieldName":"address","displayName":"住所","value":"","status":"pending","category":"立地・交通"},
+    {"fieldName":"price","displayName":"賃料/価格","value":"","status":"pending","category":"契約・オーナー条件"}
+
   ]
 }

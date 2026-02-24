@@ -144,6 +144,7 @@ public class MockLlmService implements LlmService {
         fields.add(field(cat6, "managementCompanyFlexibility", "管理会社柔軟性", "比較的柔軟", "done"));
         fields.add(field(cat6, "asIsHandoverCondition", "現況渡し条件", "スケルトン", "done"));
         fields.add(field(cat6, "runningCost", "ランニングコスト", "共益費 ¥55,000/月 + 水道基本料", "done"));
+        fields.add(field(cat6, "price", "賃料/価格", "月額 ¥850,000（税別）", "done"));
 
         // 7. スケジュール・外部環境
         String cat7 = "スケジュール・外部環境";
@@ -160,8 +161,6 @@ public class MockLlmService implements LlmService {
         fields.add(field(cat8, "pastComplaints", "過去クレーム", "騒音クレーム1件（2022年・解決済）", "done"));
         fields.add(field(cat8, "noiseOdorTolerance", "騒音・匂い耐性", "中程度（住居混在エリア）", "done"));
         fields.add(field(cat8, "otherApplicationsStatus", "他申込状況", "現在なし", "pending"));
-        fields.add(field(cat8, "requirementFulfillmentRate", "条件充足率", "87%（26/30項目）", "done"));
-        fields.add(field(cat8, "priorityAlignment", "優先順位適合", "A評価（推奨物件）", "done"));
 
         // 9. 立地・交通
         String cat9 = "立地・交通";
@@ -176,6 +175,19 @@ public class MockLlmService implements LlmService {
         fields.add(field(cat9, "largeVehicleAccess", "大型車進入可否", "不可（4t車まで）", "done"));
         fields.add(field(cat9, "mainRoadAccess", "幹線道路接続", "外苑東通り直結", "done"));
         fields.add(field(cat9, "turningRestrictions", "右左折制限", "右折禁止（朝7-9時）", "pending"));
+        fields.add(field(cat9, "address", "住所", "東京都港区六本木7-18-5", "done"));
+
+        // 10. オーナー譲れない条件
+        String cat10 = "オーナー譲れない条件";
+        fields.add(field(cat10, "conditionOwnerMusthave", "オーナー譲れない条件", "飲食業態は要事前審査、保証金10ヶ月以上", "done"));
+
+        // 11. オーナー重視・柔軟対応
+        String cat11 = "オーナー重視・柔軟対応";
+        fields.add(field(cat11, "conditionOwnerFlexible", "オーナー重視・柔軟対応", "内装工事期間中のフリーレント相談可", "pending"));
+
+        // 12. オーナーNG条件
+        String cat12 = "オーナーNG条件";
+        fields.add(field(cat12, "conditionNg", "オーナーNG条件", "風俗営業・深夜営業（24時以降）不可", "done"));
 
         return fields;
     }

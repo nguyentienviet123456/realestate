@@ -231,6 +231,7 @@ public class RealLlmService implements LlmService {
         fields.add(emptyField(cat6, "managementCompanyFlexibility", "管理会社柔軟性"));
         fields.add(emptyField(cat6, "asIsHandoverCondition", "現況渡し条件"));
         fields.add(emptyField(cat6, "runningCost", "ランニングコスト"));
+        fields.add(emptyField(cat6, "price", "賃料/価格"));
 
         // 7. スケジュール・外部環境
         String cat7 = "スケジュール・外部環境";
@@ -247,8 +248,6 @@ public class RealLlmService implements LlmService {
         fields.add(emptyField(cat8, "pastComplaints", "過去クレーム"));
         fields.add(emptyField(cat8, "noiseOdorTolerance", "騒音・匂い耐性"));
         fields.add(emptyField(cat8, "otherApplicationsStatus", "他申込状況"));
-        fields.add(emptyField(cat8, "requirementFulfillmentRate", "条件充足率"));
-        fields.add(emptyField(cat8, "priorityAlignment", "優先順位適合"));
 
         // 9. 立地・交通
         String cat9 = "立地・交通";
@@ -263,6 +262,19 @@ public class RealLlmService implements LlmService {
         fields.add(emptyField(cat9, "largeVehicleAccess", "大型車進入可否"));
         fields.add(emptyField(cat9, "mainRoadAccess", "幹線道路接続"));
         fields.add(emptyField(cat9, "turningRestrictions", "右左折制限"));
+        fields.add(emptyField(cat9, "address", "住所"));
+
+        // 10. オーナー譲れない条件
+        String cat10 = "オーナー譲れない条件";
+        fields.add(emptyField(cat10, "conditionOwnerMusthave", "オーナー譲れない条件"));
+
+        // 11. オーナー重視・柔軟対応
+        String cat11 = "オーナー重視・柔軟対応";
+        fields.add(emptyField(cat11, "conditionOwnerFlexible", "オーナー重視・柔軟対応"));
+
+        // 12. オーナーNG条件
+        String cat12 = "オーナーNG条件";
+        fields.add(emptyField(cat12, "conditionNg", "オーナーNG条件"));
 
         return fields;
     }
