@@ -20,8 +20,12 @@ export class ApiService {
     return this.http.post<ExtractResponse>(`${this.baseUrl}/extract`, formData);
   }
 
-  getSessions(): Observable<ChatSessionSummary[]> {
-    return this.http.get<ChatSessionSummary[]>(`${this.baseUrl}/sessions`);
+  getSessions(days?: number): Observable<ChatSessionSummary[]> {
+    const params: Record<string, string> = {};
+    if (days) {
+      params['days'] = days.toString();
+    }
+    return this.http.get<ChatSessionSummary[]>(`${this.baseUrl}/sessions`, { params });
   }
 
   getSession(id: string): Observable<ChatSession> {

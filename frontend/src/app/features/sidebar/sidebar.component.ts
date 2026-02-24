@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SessionService } from '../../core/services/session.service';
 import { ApiService } from '../../core/services/api.service';
@@ -8,7 +9,7 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './sidebar.component.html',
 })
 export class SidebarComponent {
@@ -19,6 +20,14 @@ export class SidebarComponent {
 
   newAnalysis(): void {
     this.sessionService.clearActive();
+  }
+
+  onFilterChange(value: string): void {
+    this.sessionService.sessionDaysFilter.set(value as 'all' | '7' | '14' | '30');
+    const days = value === 'all' ? undefined : Number(value);
+    this.apiService.getSessions(days).subscribe({
+      next: (sessions) => this.sessionService.sessions.set(sessions),
+    });
   }
 
   selectSession(id: string): void {

@@ -5,6 +5,7 @@ import { PdfUploadComponent } from './components/pdf-upload.component';
 import { MessageBubbleComponent } from './components/message-bubble.component';
 import { SessionService } from '../../core/services/session.service';
 import { ApiService } from '../../core/services/api.service';
+import { ChatMessage } from '../../core/models/chat-session.model';
 import { ExtractResponse } from '../../core/models/analyze-response.model';
 
 @Component({
@@ -61,6 +62,19 @@ export class ChatComponent implements AfterViewChecked {
 
     this.sending.set(true);
     this.messageInput = '';
+
+    // Optimistic update: show user message immediately
+    const userMessage: ChatMessage = {
+      role: 'user',
+      content,
+      type: 'text',
+      timestamp: new Date().toISOString(),
+    };
+    this.sessionService.activeSession.set({
+      ...session,
+      messages: [...session.messages, userMessage],
+    });
+    this.shouldScroll = true;
 
     this.apiService.sendMessage(session.id, content).subscribe({
       next: (updatedSession) => {

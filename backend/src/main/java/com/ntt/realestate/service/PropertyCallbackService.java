@@ -27,25 +27,34 @@ public class PropertyCallbackService {
     private final PropertyDetailsRepository propertyDetailsRepository;
 
     public void processCallback(String sessionId, String originalFileName, List<PropertyField> fields) {
+        processCallback(sessionId, originalFileName, fields, null);
+    }
+
+    public void processCallback(String sessionId, String originalFileName, List<PropertyField> fields, String llmResponse) {
         ChatSession session = chatSessionRepository.findById(sessionId)
             .orElseThrow(() -> new RuntimeException("Session not found: " + sessionId));
 
         Instant now = Instant.now();
 
-        long doneCount = fields.stream().filter(f -> "done".equals(f.getStatus())).count();
-        long pendingCount = fields.stream().filter(f -> "pending".equals(f.getStatus())).count();
-        String summary = String.format(
-            "物件情報を含むファイルを読み取り、整理して出力しました。\n" +
-            "抽出結果：全%d件（完了 %d件・確認中 %d件）",
-            doneCount + pendingCount, doneCount, pendingCount
-        );
+        String message;
+        if (llmResponse != null && !llmResponse.isBlank()) {
+            message = llmResponse;
+        } else {
+            long doneCount = fields.stream().filter(f -> "done".equals(f.getStatus())).count();
+            long pendingCount = fields.stream().filter(f -> "pending".equals(f.getStatus())).count();
+            message = String.format(
+                "物件情報を含むファイルを読み取り、整理して出力しました。\n" +
+                "抽出結果：全%d件（完了 %d件・確認中 %d件）",
+                doneCount + pendingCount, doneCount, pendingCount
+            );
+        }
 
         if (session.getMessages() == null) {
             session.setMessages(new ArrayList<>());
         }
         session.getMessages().add(ChatMessage.builder()
             .role("assistant").type("analysis_result")
-            .content(summary)
+            .content(message)
             .timestamp(now).build());
         session.setUpdatedAt(now);
 

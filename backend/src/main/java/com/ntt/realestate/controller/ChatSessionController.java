@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,11 +30,19 @@ public class ChatSessionController {
     private final ChatService chatService;
 
     @GetMapping
-    public ResponseEntity<List<ChatSessionSummary>> listSessions() {
+    public ResponseEntity<List<ChatSessionSummary>> listSessions(
+            @RequestParam(required = false) Integer days) {
         String userId = getCurrentUserId();
-        List<ChatSessionSummary> sessions = chatSessionRepository
-            .findByUserIdOrderByUpdatedAtDesc(userId)
-            .stream()
+
+        List<ChatSession> raw;
+        if (days != null && days > 0) {
+            Instant since = Instant.now().minus(days, ChronoUnit.DAYS);
+            raw = chatSessionRepository.findByUserIdAndUpdatedAtGreaterThanEqualOrderByUpdatedAtDesc(userId, since);
+        } else {
+            raw = chatSessionRepository.findByUserIdOrderByUpdatedAtDesc(userId);
+        }
+
+        List<ChatSessionSummary> sessions = raw.stream()
             .map(s -> ChatSessionSummary.builder()
                 .id(s.getId())
                 .title(s.getTitle())

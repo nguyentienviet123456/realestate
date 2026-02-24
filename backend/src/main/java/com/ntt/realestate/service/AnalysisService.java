@@ -59,7 +59,7 @@ public class AnalysisService {
 
         // Step 2: Send to LLM API (sync call, blocks until acknowledged)
         String callbackUrl = callbackBaseUrl + "/api/callback/property";
-        llmService.sendForExtraction(pdfBytes, fileName, session.getId(), callbackUrl);
+        llmService.sendForExtraction(pdfBytes, fileName, session.getId(), callbackUrl, session.getMessages());
 
         log.info("Extract request sent for session={}, file={}", session.getId(), fileName);
 

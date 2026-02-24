@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PropertyField } from '../../../core/models/property-details.model';
 import { StatusBadgeComponent } from './status-badge.component';
@@ -11,4 +11,15 @@ import { StatusBadgeComponent } from './status-badge.component';
 })
 export class FieldRowComponent {
   @Input({ required: true }) field!: PropertyField;
+  showPopup = signal(false);
+
+  openPopup(): void {
+    if (this.field.value) {
+      this.showPopup.set(true);
+    }
+  }
+
+  closePopup(): void {
+    this.showPopup.set(false);
+  }
 }

@@ -1,7 +1,38 @@
-<div class="flex items-start px-4 py-2.5 hover:bg-gray-50 gap-2">
+<div
+  class="flex items-start px-4 py-2.5 hover:bg-gray-50 gap-2 cursor-pointer"
+  (click)="openPopup()"
+>
   <app-status-badge [status]="field.status" class="flex-shrink-0 mt-0.5" />
   <div class="flex-1 min-w-0">
     <div class="text-xs text-gray-500 truncate">{{ field.displayName || field.fieldName }}</div>
-    <div class="text-sm text-gray-800 break-words">{{ field.value }}</div>
+    <div class="text-sm text-gray-800 truncate">{{ field.value || '-' }}</div>
   </div>
 </div>
+
+<!-- Popup -->
+@if (showPopup()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+    (click)="closePopup()"
+  >
+    <div
+      class="bg-white rounded-lg shadow-xl mx-4 max-w-md w-full"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+        <h3 class="text-sm font-semibold text-gray-700">{{ field.displayName || field.fieldName }}</h3>
+        <button
+          (click)="closePopup()"
+          class="text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="px-4 py-4">
+        <p class="text-sm text-gray-800 whitespace-pre-line break-words">{{ field.value || '-' }}</p>
+      </div>
+    </div>
+  </div>
+}

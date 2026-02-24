@@ -9,6 +9,7 @@ export class SessionService {
   activePropertyDetails = signal<PropertyDetails | null>(null);
   isLoading = signal<boolean>(false);
   filterStatus = signal<'all' | 'done' | 'pending'>('all');
+  sessionDaysFilter = signal<'all' | '7' | '14' | '30'>('all');
 
   categoryGroups = computed<CategoryGroup[]>(() => {
     const details = this.activePropertyDetails();

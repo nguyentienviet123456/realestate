@@ -16,6 +16,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.ntt.realestate.model.ChatMessage;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,10 +37,11 @@ public class RealLlmService implements LlmService {
     private String llmApiUrl;
 
     @Override
-    public void sendForExtraction(byte[] pdfContent, String fileName, String sessionId, String callbackUrl) {
+    public void sendForExtraction(byte[] pdfContent, String fileName, String sessionId, String callbackUrl, List<ChatMessage> chatHistory) {
         log.info("RealLLM: Sending extraction request to {} for session={}, file={}", llmApiUrl, sessionId, fileName);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("chat_history", buildChatHistoryString(chatHistory));
         body.add("message", "添付ファイルから物件・建物情報を抽出してください");
         body.add("extracted_data", buildExtractedDataTemplate(callbackUrl, sessionId, fileName));
         body.add("file", new ByteArrayResource(pdfContent) {
@@ -75,7 +78,51 @@ public class RealLlmService implements LlmService {
         log.info("RealLLM: Merged {}/{} fields with data for session={}",
             llmFields.size(), mergedFields.size(), sessionId);
 
-        propertyCallbackService.processCallback(sessionId, fileName, mergedFields);
+        propertyCallbackService.processCallback(sessionId, fileName, mergedFields, chatResponse.getResponse());
+    }
+
+    @Override
+    public String sendChatMessage(String message, List<ChatMessage> chatHistory) {
+        log.info("RealLLM: Sending chat message to {}", llmApiUrl);
+
+        String chatHistoryJson = buildChatHistoryString(chatHistory);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("chat_history", chatHistoryJson);
+        body.add("message", message);
+        body.add("extracted_data", "");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<LlmChatResponse> response = restTemplate.exchange(
+            llmApiUrl, HttpMethod.POST, requestEntity, LlmChatResponse.class
+        );
+
+        LlmChatResponse chatResponse = response.getBody();
+        if (chatResponse == null || chatResponse.getResponse() == null) {
+            throw new RuntimeException("Empty response from LLM API");
+        }
+
+        log.info("RealLLM: Chat response received, tokensUsed={}", chatResponse.getTokensUsed());
+        return chatResponse.getResponse();
+    }
+
+    private String buildChatHistoryString(List<ChatMessage> chatHistory) {
+        if (chatHistory == null || chatHistory.isEmpty()) {
+            return "";
+        }
+        try {
+            List<Map<String, String>> history = chatHistory.stream()
+                .map(msg -> Map.of("role", msg.getRole(), "content", msg.getContent()))
+                .collect(Collectors.toList());
+            return objectMapper.writeValueAsString(history);
+        } catch (Exception e) {
+            log.error("Failed to serialize chat history", e);
+            return "";
+        }
     }
 
     private List<PropertyField> mergeFields(List<PropertyField> template, List<PropertyField> llmFields) {
