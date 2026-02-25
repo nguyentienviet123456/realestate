@@ -13,7 +13,8 @@ import { ApiService } from '../../core/services/api.service';
 })
 export class LoginComponent {
   loginForm: FormGroup;
-  errorMessage = '';
+  usernameError = '';
+  passwordError = '';
   isLoading = false;
 
   constructor(
@@ -32,20 +33,28 @@ export class LoginComponent {
     if (this.loginForm.invalid) return;
 
     this.isLoading = true;
-    this.errorMessage = '';
+    this.usernameError = '';
+    this.passwordError = '';
 
     const { username, password } = this.loginForm.value;
-    this.authService.login(username, password);
 
-    this.apiService.getSessions().subscribe({
-      next: () => {
+    this.apiService.login(username, password).subscribe({
+      next: (response) => {
         this.isLoading = false;
-        this.router.navigate(['/']);
+
+        if (response.success) {
+          this.authService.login(username, password);
+          this.router.navigate(['/']);
+        } else if (response.errorCode === 'MSG-LOGIN-INFOR-NOT-ACTIVE') {
+          this.usernameError = 'MSG-LOGIN-INFOR-NOT-ACTIVE';
+        } else {
+          this.usernameError = 'MSG-LOGIN-INFOR-ERROR';
+          this.passwordError = 'MSG-LOGIN-INFOR-ERROR';
+        }
       },
       error: () => {
         this.isLoading = false;
-        this.authService.logout();
-        this.errorMessage = 'Invalid username or password';
+        this.usernameError = 'サーバーに接続できません。';
       },
     });
   }

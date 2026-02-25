@@ -28,6 +28,8 @@ public class User {
 
     private String displayName;
 
+    private String status; // "active" or "inactive"
+
     private Instant createdAt;
     private Instant updatedAt;
 }

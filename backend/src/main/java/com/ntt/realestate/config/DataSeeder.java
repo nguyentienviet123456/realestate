@@ -30,6 +30,7 @@ public class DataSeeder implements ApplicationRunner {
         seedUser("admin", "admin123", "ROLE_ADMIN", "Administrator");
         seedUser("user1", "abcxyz@1", "ROLE_USER", "User1");
         seedUser("user2", "abc123@2", "ROLE_USER", "User2");
+        seedUser("user3", "abc123@3", "ROLE_USER", "User3");
 
         backfillOrphanedSessions();
     }
@@ -41,6 +42,7 @@ public class DataSeeder implements ApplicationRunner {
                 .passwordHash(passwordEncoder.encode(rawPassword))
                 .role(role)
                 .displayName(displayName)
+                .status("active")
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .build();
