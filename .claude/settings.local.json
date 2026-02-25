@@ -19,7 +19,8 @@
       "Bash(npx ng build:*)",
       "Bash(./mvnw clean spring-boot:run:*)",
       "Bash(./mvnw spring-boot:run:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(mongodump --uri=\"mongodb://root:rootpassword@localhost:27017/realestate_dx?authSource=admin\" --out=/Users/vietnt/Viet/ntt/realestate_dx/db_backup)"
     ]
   }
 }
